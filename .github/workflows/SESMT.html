@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>SGI – Segurança e Meio Ambiente | Conterplan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ===== PALETA CONTERPLAN ===== -->
+<style>
+:root{
+    --conter-blue:#006bb3;
+    --conter-blue-dark:#00436e;
+    --conter-orange:#f68c1f;
+    --conter-orange-dark:#c66a0f;
+    --conter-bg:#f3f6fb;
+    --card-bg:#ffffff;
+    --border-soft:#d5dde7;
+    --text-main:#1f2933;
+    --text-muted:#6b7280;
+    --danger:#d83434;
+    --success:#1c9b4a;
+    --warning:#f2b10c;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+body{
+    background:var(--conter-bg);
+    color:var(--text-main);
+}
+.app-container{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+/* HEADER */
+.app-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0.75rem 1.25rem;
+    background:linear-gradient(90deg,var(--conter-blue-dark),var(--conter-blue));
+    color:#fff;
+    box-shadow:0 4px 18px rgba(0,0,0,0.25);
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+.app-header-left{
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+}
+.app-logo{
+    width:44px;
+    height:44px;
+    border-radius:999px;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+.app-logo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+.app-title{
+    font-size:1.1rem;
+    font-weight:700;
+    line-height:1.2;
+}
+.app-subtitle{
+    font-size:0.75rem;
+    opacity:0.85;
+}
+.app-header-right{
+    text-align:right;
+    font-size:0.7rem;
+}
+
+/* LAYOUT PRINCIPAL */
+.app-main{
+    display:flex;
+    flex:1;
+    min-height:0;
+}
+
+/* MENU LATERAL */
+.sidebar{
+    width:230px;
+    background:#ffffff;
+    border-right:1px solid var(--border-soft);
+    padding:0.75rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+}
+@media (max-width:900px){
+    .app-main{flex-direction:column;}
+    .sidebar{
+        width:100%;
+        flex-direction:row;
+        overflow-x:auto;
+        border-right:none;
+        border-bottom:1px solid var(--border-soft);
+    }
+}
+.nav-btn{
+    border:none;
+    padding:0.55rem 0.7rem;
+    border-radius:999px;
+    background:transparent;
+    color:var(--text-muted);
+    font-size:0.82rem;
+    display:flex;
+    align-items:center;
+    gap:0.4rem;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:.18s;
+}
+.nav-btn span.icon{
+    font-size:1rem;
+}
+.nav-btn.active{
+    background:rgba(0,107,179,0.09);
+    color:var(--conter-blue-dark);
+    font-weight:600;
+}
+.nav-btn:hover{
+    background:rgba(0,0,0,0.04);
+}
+
+/* CONTEÚDO */
+.content{
+    flex:1;
+    padding:1rem 1.25rem 1.5rem;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+}
+
+.section{
+    display:none;
+}
+.section.active{
+    display:block;
+}
+
+/* CARDS */
+.card{
+    background:var(--card-bg);
+    border-radius:16px;
+    padding:1rem 1.1rem;
+    box-shadow:0 10px 30px rgba(15,23,42,0.08);
+    border:1px solid rgba(148,163,184,0.35);
+    margin-bottom:1rem;
+}
+.card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:0.65rem;
+}
+.card-title{
+    font-size:0.98rem;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:0.4rem;
+}
+.card-title span.icon{
+    font-size:1.1rem;
+}
+.card-subtitle{
+    font-size:0.78rem;
+    color:var(--text-muted);
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    gap:0.75rem;
+}
+.grid-2{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.grid-3{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+}
+@media (max-width:900px){
+    .grid-2,.grid-3{
+        grid-template-columns:1fr;
+    }
+}
+
+/* KPI */
+.kpi{
+    padding:0.65rem 0.75rem;
+    border-radius:12px;
+    background:linear-gradient(145deg,#ffffff, #eef2ff);
+    border:1px solid rgba(148,163,184,0.4);
+}
+.kpi-label{
+    font-size:0.78rem;
+    color:var(--text-muted);
+}
+.kpi-value{
+    margin-top:0.12rem;
+    font-size:1.4rem;
+    font-weight:700;
+}
+.kpi-tag{
+    font-size:0.7rem;
+    margin-top:0.2rem;
+}
+.kpi-tag.positivo{color:var(--success);}
+.kpi-tag.negativo{color:var(--danger);}
+
+/* CARDS DE GRÁFICO – altura fixa p/ não mexer a barra de rolagem */
+.card-chart{
+    min-height:240px;
+}
+.card-chart canvas{
+    width:100% !important;
+    height:200px !important;
+    display:block;
+}
+
+/* FORMULÁRIOS */
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0.7rem 0.9rem;
+}
+@media (max-width:900px){
+    .form-grid{grid-template-columns:1fr;}
+}
+label{
+    font-size:0.78rem;
+    color:var(--text-main);
+    margin-bottom:0.15rem;
+    display:block;
+}
+.input,select,textarea{
+    width:100%;
+    padding:0.45rem 0.55rem;
+    border-radius:8px;
+    border:1px solid var(--border-soft);
+    font-size:0.82rem;
+    color:var(--text-main);
+    background:#fff;
+}
+textarea{min-height:70px;resize:vertical;}
+input[type="file"]{
+    padding:0.35rem;
+    font-size:0.78rem;
+}
+
+/* BOTÕES */
+.btn{
+    border:none;
+    border-radius:999px;
+    padding:0.45rem 0.9rem;
+    font-size:0.78rem;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:0.35rem;
+    transition:.15s;
+    white-space:nowrap;
+}
+.btn-primary{
+    background:var(--conter-orange);
+    color:#fff;
+}
+.btn-primary:hover{
+    background:var(--conter-orange-dark);
+}
+.btn-outline{
+    background:transparent;
+    border:1px solid var(--border-soft);
+    color:var(--text-main);
+}
+.btn-outline:hover{
+    background:#eef2ff;
+}
+.btn-danger{
+    background:var(--danger);
+    color:#fff;
+}
+.btn-sm{
+    padding:0.25rem 0.6rem;
+    font-size:0.72rem;
+}
+
+/* TABLE */
+.table-container{
+    width:100%;
+    overflow:auto;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.78rem;
+}
+th,td{
+    border-bottom:1px solid #e5e7eb;
+    padding:0.4rem 0.45rem;
+    text-align:left;
+}
+th{
+    background:#f9fafb;
+    font-weight:600;
+    position:sticky;
+    top:0;
+    z-index:5;
+}
+tr:nth-child(even){
+    background:#f9fafb;
+}
+
+/* TAGS STATUS */
+.badge{
+    display:inline-flex;
+    align-items:center;
+    border-radius:999px;
+    padding:0.12rem 0.5rem;
+    font-size:0.7rem;
+    font-weight:500;
+}
+.badge-acidente{background:rgba(216,52,52,0.08);color:var(--danger);}
+.badge-nc{background:rgba(246,140,31,0.12);color:var(--conter-orange-dark);}
+.badge-ambiental{background:rgba(28,155,74,0.1);color:var(--success);}
+.badge-evidencia{background:rgba(37,99,235,0.08);color:#1d4ed8;}
+.badge-aberto{background:rgba(248,181,37,0.2);color:#854d0e;}
+.badge-andamento{background:rgba(59,130,246,0.2);color:#1d4ed8;}
+.badge-concluido{background:rgba(22,163,74,0.2);color:#166534;}
+
+/* MATRIZ DE RISCO */
+.matriz-container{
+    margin-top:0.5rem;
+    overflow:auto;
+}
+.matriz{
+    border-collapse:collapse;
+    font-size:0.72rem;
+}
+.matriz th,.matriz td{
+    border:1px solid #e5e7eb;
+    padding:0.28rem 0.35rem;
+    text-align:center;
+}
+.matriz-header{
+    background:var(--conter-blue);
+    color:#fff;
+}
+.matriz-vert{
+    background:#eff6ff;
+    font-weight:600;
+}
+.rp{background:#22c55e33;}  /* risco pequeno */
+.rm{background:#eab30833;}  /* risco médio */
+.ra{background:#f9731633;}  /* risco alto */
+.rc{background:#ef444433;}  /* risco crítico */
+
+/* MODAL */
+.modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:40;
+}
+.modal{
+    background:#fff;
+    border-radius:16px;
+    max-width:720px;
+    width:94%;
+    max-height:90vh;
+    overflow:auto;
+    padding:1rem;
+    box-shadow:0 20px 40px rgba(15,23,42,0.35);
+}
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:0.5rem;
+}
+.modal-title{
+    font-size:0.95rem;
+    font-weight:600;
+}
+.modal-close{
+    border:none;
+    background:transparent;
+    font-size:1.1rem;
+    cursor:pointer;
+}
+
+/* QR canvas */
+#qrContainer{
+    display:flex;
+    justify-content:center;
+}
+
+/* ALERTA SIMPLES */
+.alert{
+    padding:0.45rem 0.6rem;
+    border-radius:10px;
+    font-size:0.75rem;
+    background:#ecfdf5;
+    color:#166534;
+    border:1px solid #bbf7d0;
+    margin-bottom:0.5rem;
+}
+.alert-warn{
+    background:#fffbeb;
+    border-color:#fed7aa;
+    color:#92400e;
+}
+
+/* RODAPÉ PEQUENO */
+.footer{
+    font-size:0.7rem;
+    color:var(--text-muted);
+    text-align:right;
+    margin-top:auto;
+    padding:0.25rem 0.5rem 0.3rem;
+}
+</style>
+</head>
+<body>
+<div class="app-container">
+    <header class="app-header">
+        <div class="app-header-left">
+            <div class="app-logo">
+                <!-- Trocar o src pelo caminho real do logo Conterplan -->
+                <img src="logo_conterplan.png" alt="Conterplan">
+            </div>
+            <div>
+                <div class="app-title">SGI – Segurança & Meio Ambiente</div>
+                <div class="app-subtitle">Gestão de acidentes, não conformidades e evidências | Conterplan</div>
+            </div>
+        </div>
+        <div class="app-header-right">
+            <div style="font-weight:600;">Modo Offline + Supabase (opcional)</div>
+            <div id="resumoRegistros">0 registros salvos</div>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <!-- MENU -->
+        <nav class="sidebar">
+            <button class="nav-btn active" data-section="sec-dashboard">
+                <span class="icon">📊</span><span>Dashboard</span>
+            </button>
+            <button class="nav-btn" data-section="sec-acidentes">
+                <span class="icon">🩺</span><span>Acidentes</span>
+            </button>
+            <button class="nav-btn" data-section="sec-nc">
+                <span class="icon">⚠️</span><span>Não Conformidades</span>
+            </button>
+            <button class="nav-btn" data-section="sec-ambiental">
+                <span class="icon">🌱</span><span>Ambiental</span>
+            </button>
+            <button class="nav-btn" data-section="sec-evidencias">
+                <span class="icon">📷</span><span>Evidências</span>
+            </button>
+            <button class="nav-btn" data-section="sec-banco">
+                <span class="icon">📚</span><span>Banco de Dados</span>
+            </button>
+            <button class="nav-btn" data-section="sec-relatorios">
+                <span class="icon">📄</span><span>Relatórios & PDF</span>
+            </button>
+            <button class="nav-btn" data-section="sec-config">
+                <span class="icon">⚙️</span><span>Configurações</span>
+            </button>
+        </nav>
+
+        <!-- CONTEÚDO -->
+        <section class="content">
+
+            <!-- DASHBOARD -->
+            <section id="sec-dashboard" class="section active">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">📊</span>Visão Geral</div>
+                        <div class="card-subtitle">Resumo automático das ocorrências registradas</div>
+                    </div>
+                    <div class="grid grid-3">
+                        <div class="kpi">
+                            <div class="kpi-label">Total de ocorrências</div>
+                            <div class="kpi-value" id="kpiTotal">0</div>
+                            <div class="kpi-tag positivo" id="kpiTotalDetalhe">Nenhum registro ainda</div>
+                        </div>
+                        <div class="kpi">
+                            <div class="kpi-label">Acidentes no mês</div>
+                            <div class="kpi-value" id="kpiAcidentesMes">0</div>
+                            <div class="kpi-tag" id="kpiAcidentesMesDetalhe">Mês atual</div>
+                        </div>
+                        <div class="kpi">
+                            <div class="kpi-label">% Não Conformidades resolvidas</div>
+                            <div class="kpi-value" id="kpiNcResolvidas">0%</div>
+                            <div class="kpi-tag" id="kpiNcResolvidasDetalhe">Acompanhe o fechamento</div>
+                        </div>
+                    </div>
+                    <!-- KPIs TF/TG -->
+                    <div class="grid grid-2" style="margin-top:0.75rem;">
+                        <div class="kpi">
+                            <div class="kpi-label">Taxa de Frequência (TF)</div>
+                            <div class="kpi-value" id="kpiTf">--</div>
+                            <div class="kpi-tag" id="kpiTfDetalhe">Configure as horas trabalhadas em Configurações</div>
+                        </div>
+                        <div class="kpi">
+                            <div class="kpi-label">Taxa de Gravidade (TG)</div>
+                            <div class="kpi-value" id="kpiTg">--</div>
+                            <div class="kpi-tag" id="kpiTgDetalhe">Usa dias de afastamento cadastrados</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card card-chart">
+                        <div class="card-header">
+                            <div class="card-title"><span class="icon">📈</span>Ocorrências por tipo</div>
+                        </div>
+                        <canvas id="chartTipos"></canvas>
+                    </div>
+                    <div class="card card-chart">
+                        <div class="card-header">
+                            <div class="card-title"><span class="icon">📆</span>Ocorrências por mês (últimos 12 meses)</div>
+                        </div>
+                        <canvas id="chartMeses"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card card-chart">
+                        <div class="card-header">
+                            <div class="card-title"><span class="icon">🩹</span>Acidentes – com perda x sem perda</div>
+                        </div>
+                        <canvas id="chartPerda"></canvas>
+                    </div>
+                    <div class="card card-chart">
+                        <div class="card-header">
+                            <div class="card-title"><span class="icon">🏭</span>Ranking de áreas / setores (Top 5)</div>
+                        </div>
+                        <canvas id="chartSetores"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">🧩</span>Matriz de Avaliação de Riscos</div>
+                        <div class="card-subtitle">Baseada na matriz de probabilidade x impacto utilizada na Conterplan</div>
+                    </div>
+                    <div class="matriz-container">
+                        <table class="matriz">
+                            <tr>
+                                <th rowspan="2" class="matriz-header">Probabilidade</th>
+                                <th colspan="5" class="matriz-header">Impacto</th>
+                            </tr>
+                            <tr>
+                                <th>Muito Baixo<br>1</th>
+                                <th>Baixo<br>2</th>
+                                <th>Médio<br>3</th>
+                                <th>Alto<br>4</th>
+                                <th>Muito Alto<br>5</th>
+                            </tr>
+                            <tr>
+                                <td class="matriz-vert">5 – Praticamente certo</td>
+                                <td class="rm">RM</td>
+                                <td class="ra">RA</td>
+                                <td class="ra">RA</td>
+                                <td class="rc">RC</td>
+                                <td class="rc">RC</td>
+                            </tr>
+                            <tr>
+                                <td class="matriz-vert">4 – Muito provável</td>
+                                <td class="rm">RM</td>
+                                <td class="rm">RM</td>
+                                <td class="ra">RA</td>
+                                <td class="ra">RA</td>
+                                <td class="rc">RC</td>
+                            </tr>
+                            <tr>
+                                <td class="matriz-vert">3 – Provável</td>
+                                <td class="rp">RP</td>
+                                <td class="rm">RM</td>
+                                <td class="rm">RM</td>
+                                <td class="ra">RA</td>
+                                <td class="ra">RA</td>
+                            </tr>
+                            <tr>
+                                <td class="matriz-vert">2 – Pouco provável</td>
+                                <td class="rp">RP</td>
+                                <td class="rp">RP</td>
+                                <td class="rm">RM</td>
+                                <td class="rm">RM</td>
+                                <td class="ra">RA</td>
+                            </tr>
+                            <tr>
+                                <td class="matriz-vert">1 – Raro</td>
+                                <td class="rp">RP</td>
+                                <td class="rp">RP</td>
+                                <td class="rp">RP</td>
+                                <td class="rm">RM</td>
+                                <td class="rm">RM</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="margin-top:0.5rem;font-size:0.75rem;">
+                        <strong>Classificação:</strong> RP – Risco Pequeno | RM – Risco Médio | RA – Risco Alto | RC – Risco Crítico
+                    </div>
+                </div>
+            </section>
+
+            <!-- ACIDENTES -->
+            <section id="sec-acidentes" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">🩺</span>Registro de Acidente</div>
+                        <div class="card-subtitle">Alinhado ao SOC / SGI – use para acidentes típicos, trajeto, doença ocupacional, etc.</div>
+                    </div>
+
+                    <form id="formAcidente">
+                        <div class="alert">
+                            Sempre que possível inclua fotos de <strong>antes</strong>, <strong>durante</strong> e <strong>depois</strong> da ação.
+                        </div>
+                        <div class="form-grid">
+                            <div>
+                                <label>Nome do colaborador</label>
+                                <input class="input" id="ac-nome" required>
+                            </div>
+                            <div>
+                                <label>CPF</label>
+                                <input class="input" id="ac-cpf" placeholder="apenas números" maxlength="14">
+                            </div>
+                            <div>
+                                <label>Função</label>
+                                <input class="input" id="ac-funcao">
+                            </div>
+                            <div>
+                                <label>Chefe imediato</label>
+                                <input class="input" id="ac-chefe">
+                            </div>
+                            <div>
+                                <label>Local do acidente / setor</label>
+                                <input class="input" id="ac-local" required>
+                            </div>
+                            <div>
+                                <label>Data e horário</label>
+                                <input type="datetime-local" class="input" id="ac-data" required>
+                            </div>
+                            <div>
+                                <label>Classificação de risco (Matriz)</label>
+                                <select class="input" id="ac-classificacao" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="RP">RP – Risco Pequeno</option>
+                                    <option value="RM">RM – Risco Médio</option>
+                                    <option value="RA">RA – Risco Alto</option>
+                                    <option value="RC">RC – Risco Crítico</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Acidente com perda?</label>
+                                <select class="input" id="ac-perda">
+                                    <option value="">Selecione...</option>
+                                    <option value="sem_perda">Sem perda</option>
+                                    <option value="com_perda">Com perda / com lesão</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Abertura de CAT</label>
+                                <select class="input" id="ac-cat">
+                                    <option value="">Selecione...</option>
+                                    <option value="sim">Sim</option>
+                                    <option value="nao">Não</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Tipo de acidente (SOC)</label>
+                                <select class="input" id="ac-tipo-acidente">
+                                    <option value="">Selecione...</option>
+                                    <option value="Típico">Típico</option>
+                                    <option value="Trajeto">Trajeto</option>
+                                    <option value="Doença ocupacional">Doença ocupacional</option>
+                                    <option value="Quase acidente">Quase acidente</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Tipo de lesão</label>
+                                <input class="input" id="ac-tipo-lesao" placeholder="Corte, contusão, entorse, queimadura, etc.">
+                            </div>
+                            <div>
+                                <label>Parte do corpo atingida</label>
+                                <input class="input" id="ac-parte-corpo" placeholder="Mão direita, pé esquerdo, coluna, etc.">
+                            </div>
+                            <div>
+                                <label>Dias de afastamento previstos</label>
+                                <input type="number" min="0" class="input" id="ac-dias-afast" placeholder="0 se sem afastamento">
+                            </div>
+                            <div>
+                                <label>CID / Nº do atestado (opcional)</label>
+                                <input class="input" id="ac-cid">
+                            </div>
+                            <div>
+                                <label>Classificação SOC / SGI</label>
+                                <select class="input" id="ac-class-soc">
+                                    <option value="">Selecione...</option>
+                                    <option value="Com afastamento">Com afastamento</option>
+                                    <option value="Sem afastamento">Sem afastamento</option>
+                                    <option value="Atendimento médico">Atendimento médico</option>
+                                    <option value="Primeiros socorros">Primeiros socorros</option>
+                                    <option value="Quase acidente">Quase acidente</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Fotos (pode selecionar várias)</label>
+                                <input type="file" id="ac-fotos" accept="image/*" multiple capture="environment">
+                            </div>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Descrição do ocorrido</label>
+                            <textarea id="ac-descricao" required placeholder="Descreva o que aconteceu, atividades envolvidas, agentes, condições, etc."></textarea>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Medidas a serem tomadas / Ações corretivas</label>
+                            <textarea id="ac-medidas" placeholder="Informe medidas imediatas, corretivas e preventivas."></textarea>
+                        </div>
+                        <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <button type="submit" class="btn btn-primary">💾 Salvar acidente</button>
+                            <button type="reset" class="btn btn-outline">Limpar formulário</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- NÃO CONFORMIDADES -->
+            <section id="sec-nc" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">⚠️</span>Registro de Não Conformidade</div>
+                        <div class="card-subtitle">Relacionada à Segurança, Saúde, Meio Ambiente ou Documentação</div>
+                    </div>
+                    <form id="formNc">
+                        <div class="form-grid">
+                            <div>
+                                <label>Tipo de não conformidade</label>
+                                <select class="input" id="nc-tipo" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Segurança">Segurança</option>
+                                    <option value="Saúde">Saúde</option>
+                                    <option value="Meio Ambiente">Meio Ambiente</option>
+                                    <option value="Comportamental">Comportamental</option>
+                                    <option value="Documental">Documental</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Responsável pelo local / setor</label>
+                                <input class="input" id="nc-responsavel">
+                            </div>
+                            <div>
+                                <label>Quem identificou</label>
+                                <input class="input" id="nc-identificou">
+                            </div>
+                            <div>
+                                <label>Data</label>
+                                <input type="date" class="input" id="nc-data" required>
+                            </div>
+                            <div>
+                                <label>Área / Local</label>
+                                <input class="input" id="nc-local" required>
+                            </div>
+                            <div>
+                                <label>Status</label>
+                                <select class="input" id="nc-status" required>
+                                    <option value="Aberto">Aberto</option>
+                                    <option value="Em andamento">Em andamento</option>
+                                    <option value="Concluído">Concluído</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Classificação de risco</label>
+                                <select class="input" id="nc-classificacao">
+                                    <option value="">Selecione...</option>
+                                    <option value="RP">RP – Risco Pequeno</option>
+                                    <option value="RM">RM – Risco Médio</option>
+                                    <option value="RA">RA – Risco Alto</option>
+                                    <option value="RC">RC – Risco Crítico</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Fotos</label>
+                                <input type="file" id="nc-fotos" accept="image/*" multiple capture="environment">
+                            </div>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Descrição da não conformidade</label>
+                            <textarea id="nc-descricao" required></textarea>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Ação corretiva / Prazo</label>
+                            <textarea id="nc-acoes" placeholder="Descreva ações propostas e prazos."></textarea>
+                        </div>
+                        <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <button type="submit" class="btn btn-primary">💾 Salvar não conformidade</button>
+                            <button type="reset" class="btn btn-outline">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- AMBIENTAL -->
+            <section id="sec-ambiental" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">🌱</span>Registro Ambiental</div>
+                        <div class="card-subtitle">Erosão, vazamentos, resíduos, limpeza de áreas, apoio à prefeitura etc.</div>
+                    </div>
+                    <form id="formAmbiental">
+                        <div class="form-grid">
+                            <div>
+                                <label>Tipo de ocorrência</label>
+                                <select class="input" id="amb-tipo" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Vazamento de óleo">Vazamento de óleo</option>
+                                    <option value="Erosão / talude">Erosão / talude</option>
+                                    <option value="Resíduos / entulho">Resíduos / entulho</option>
+                                    <option value="Limpeza preventiva">Limpeza preventiva</option>
+                                    <option value="Fauna / animais peçonhentos">Fauna / animais peçonhentos</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Data</label>
+                                <input type="date" class="input" id="amb-data" required>
+                            </div>
+                            <div>
+                                <label>Local / referência</label>
+                                <input class="input" id="amb-local" required>
+                            </div>
+                            <div>
+                                <label>Responsável pela ação</label>
+                                <input class="input" id="amb-responsavel">
+                            </div>
+                            <div>
+                                <label>Volume / extensão (se aplicável)</label>
+                                <input class="input" id="amb-volume" placeholder="Ex.: 9 metros, 4 viagens de caminhão, etc.">
+                            </div>
+                            <div>
+                                <label>Fotos</label>
+                                <input type="file" id="amb-fotos" accept="image/*" multiple capture="environment">
+                            </div>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Descrição da ocorrência</label>
+                            <textarea id="amb-descricao" required></textarea>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Ações executadas / parceiros (prefeitura, secretaria de meio ambiente, etc.)</label>
+                            <textarea id="amb-acoes"></textarea>
+                        </div>
+                        <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <button type="submit" class="btn btn-primary">💾 Salvar registro ambiental</button>
+                            <button type="reset" class="btn btn-outline">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- EVIDÊNCIAS -->
+            <section id="sec-evidencias" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">📷</span>Evidências – Antes x Depois</div>
+                        <div class="card-subtitle">Registre melhorias visuais para comprovar ações de Segurança e Meio Ambiente</div>
+                    </div>
+                    <form id="formEvidencia">
+                        <div class="form-grid">
+                            <div>
+                                <label>Título da evidência</label>
+                                <input class="input" id="ev-titulo" required placeholder="Ex.: Limpeza ao redor do galpão">
+                            </div>
+                            <div>
+                                <label>Data</label>
+                                <input type="date" class="input" id="ev-data" required>
+                            </div>
+                            <div>
+                                <label>Área / Setor</label>
+                                <input class="input" id="ev-area" required>
+                            </div>
+                            <div>
+                                <label>Responsável pela ação</label>
+                                <input class="input" id="ev-responsavel">
+                            </div>
+                            <div>
+                                <label>Fotos ANTES</label>
+                                <input type="file" id="ev-fotos-antes" accept="image/*" multiple capture="environment">
+                            </div>
+                            <div>
+                                <label>Fotos DEPOIS</label>
+                                <input type="file" id="ev-fotos-depois" accept="image/*" multiple capture="environment">
+                            </div>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Descrição (situação antes, risco, objetivo da ação)</label>
+                            <textarea id="ev-descricaoAntes" required></textarea>
+                        </div>
+                        <div style="margin-top:0.6rem;">
+                            <label>Descrição da melhoria (como ficou depois, benefício, controle)</label>
+                            <textarea id="ev-descricaoDepois" required></textarea>
+                        </div>
+                        <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <button type="submit" class="btn btn-primary">💾 Salvar evidência</button>
+                            <button type="reset" class="btn btn-outline">Limpar</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- BANCO DE DADOS -->
+            <section id="sec-banco" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">📚</span>Banco de Dados</div>
+                        <div class="card-subtitle">Filtros rápidos para pesquisa de ocorrências</div>
+                    </div>
+                    <div class="grid grid-3" style="margin-bottom:0.7rem;">
+                        <div>
+                            <label>Tipo</label>
+                            <select class="input" id="filtro-tipo">
+                                <option value="">Todos</option>
+                                <option value="acidente">Acidente</option>
+                                <option value="nc">Não conformidade</option>
+                                <option value="ambiental">Ambiental</option>
+                                <option value="evidencia">Evidência</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Data inicial</label>
+                            <input type="date" class="input" id="filtro-data-inicio">
+                        </div>
+                        <div>
+                            <label>Data final</label>
+                            <input type="date" class="input" id="filtro-data-fim">
+                        </div>
+                        <div>
+                            <label>Buscar por nome / local / área</label>
+                            <input class="input" id="filtro-texto" placeholder="Digite parte do nome, local, área...">
+                        </div>
+                        <div>
+                            <label>Classificação de risco</label>
+                            <select class="input" id="filtro-classificacao">
+                                <option value="">Todas</option>
+                                <option value="RP">RP</option>
+                                <option value="RM">RM</option>
+                                <option value="RA">RA</option>
+                                <option value="RC">RC</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;align-items:flex-end;gap:0.4rem;">
+                            <button class="btn btn-outline btn-sm" id="btnAplicarFiltros">Aplicar filtros</button>
+                            <button class="btn btn-outline btn-sm" id="btnLimparFiltros">Limpar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Data</th>
+                                    <th>Resumo</th>
+                                    <th>Class.</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-registros">
+                                <!-- preenchido via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RELATÓRIOS -->
+            <section id="sec-relatorios" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">📄</span>Relatórios, PDF, WhatsApp & E-mail</div>
+                        <div class="card-subtitle">Selecione um registro no banco de dados e gere o relatório detalhado</div>
+                    </div>
+                    <div class="alert-warn">
+                        Vá até a aba <strong>Banco de Dados</strong>, clique em <strong>"PDF"</strong> na linha desejada, e o relatório será gerado aqui embaixo.
+                    </div>
+                    <div id="previewRelatorio" style="border-radius:12px;border:1px dashed #d1d5db;padding:0.75rem;font-size:0.8rem;background:#fff;">
+                        Nenhum relatório selecionado ainda.
+                    </div>
+                    <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                        <button class="btn btn-primary" id="btnGerarPdfDireto">📥 Gerar PDF do relatório atual</button>
+                        <button class="btn btn-outline" id="btnCopiarTexto">📋 Copiar texto (para WhatsApp / e-mail)</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONFIGURAÇÕES -->
+            <section id="sec-config" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><span class="icon">⚙️</span>Configurações & Supabase (opcional)</div>
+                        <div class="card-subtitle">Modo offline já funciona sozinho. Supabase é apenas para backup em nuvem.</div>
+                    </div>
+                    <div class="grid grid-2">
+                        <div>
+                            <h3 style="font-size:0.9rem;margin-bottom:0.3rem;">Sincronização com Supabase</h3>
+                            <p style="font-size:0.78rem;margin-bottom:0.4rem;color:var(--text-muted);">
+                                Preencha os dados abaixo se desejar enviar cópias dos registros para uma tabela na nuvem.
+                                Recomenda-se criar a tabela <strong>ocorrencias_sgi</strong> com colunas compatíveis.
+                            </p>
+                            <label>Supabase URL</label>
+                            <input class="input" id="sp-url" placeholder="https://xxxxx.supabase.co">
+                            <label style="margin-top:0.4rem;">Supabase Anon Key</label>
+                            <input class="input" id="sp-key" placeholder="chave pública">
+                            <label style="margin-top:0.4rem;">Nome da tabela</label>
+                            <input class="input" id="sp-tabela" value="ocorrencias_sgi">
+                            <div style="margin-top:0.6rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                                <button class="btn btn-outline btn-sm" id="btnTestarSupabase">Testar conexão</button>
+                                <button class="btn btn-outline btn-sm" id="btnSincronizarAgora">Sincronizar registros agora</button>
+                            </div>
+                            <div id="statusSupabase" style="margin-top:0.4rem;font-size:0.75rem;color:var(--text-muted);"></div>
+                        </div>
+                        <div>
+                            <h3 style="font-size:0.9rem;margin-bottom:0.3rem;">Backup local</h3>
+                            <p style="font-size:0.78rem;margin-bottom:0.4rem;color:var(--text-muted);">
+                                Você pode exportar todos os registros em um arquivo JSON para salvar em outro lugar e importar novamente quando precisar.
+                            </p>
+                            <button class="btn btn-outline btn-sm" id="btnExportarJson">⬇️ Exportar banco (JSON)</button>
+                            <div style="margin-top:0.4rem;">
+                                <label>Importar arquivo JSON</label>
+                                <input type="file" id="inputImportarJson" accept="application/json">
+                            </div>
+
+                            <div style="margin-top:1rem;">
+                                <h3 style="font-size:0.9rem;margin-bottom:0.3rem;">Parâmetros TF / TG (frequência & gravidade)</h3>
+                                <p style="font-size:0.78rem;margin-bottom:0.4rem;color:var(--text-muted);">
+                                    Informe o período e as horas trabalhadas para calcular indicadores de segurança com base nos acidentes
+                                    com afastamento / com lesão.
+                                </p>
+                                <label>Período de referência</label>
+                                <input class="input" id="cfg-periodo" placeholder="Ex.: 11/2025 – turno geral">
+                                <label style="margin-top:0.4rem;">Horas trabalhadas no período</label>
+                                <input type="number" class="input" id="cfg-horas" placeholder="Ex.: 180000 (todas as horas dos colaboradores)">
+                                <button class="btn btn-outline btn-sm" style="margin-top:0.5rem;" id="btnSalvarCfgTfTg">Salvar parâmetros</button>
+                                <div id="cfg-status" style="margin-top:0.3rem;font-size:0.75rem;color:var(--text-muted);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="footer">
+                SGI Conterplan – desenvolvido para apoiar Segurança, Saúde e Meio Ambiente.
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- MODAL DETALHE + QR -->
+<div class="modal-backdrop" id="modalDetalhe">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitulo">Detalhes</div>
+            <button class="modal-close" onclick="fecharModalDetalhe()">✕</button>
+        </div>
+        <div id="modalConteudo" style="font-size:0.8rem;"></div>
+        <hr style="margin:0.8rem 0;">
+        <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+                <strong style="font-size:0.8rem;">QR Code do registro</strong>
+                <button class="btn btn-outline btn-sm" onclick="baixarQr()">⬇️ Baixar QR</button>
+            </div>
+            <div id="qrContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- AREA OCULTA PARA PDF -->
+<div id="areaPdf" style="position:fixed;left:-9999px;top:-9999px;width:794px;background:#fff;padding:24px;font-size:12px;"></div>
+
+<!-- ===== BIBLIOTECAS EXTERNAS (CDN) ===== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* ==========================
+   BANCO LOCAL – LOCALSTORAGE
+   ========================== */
+const STORAGE_KEY = 'sgi_conterplan_ocorrencias_v1';
+const CONFIG_KEY = 'sgi_conterplan_config_v1';
+
+let ocorrencias = [];
+let relatorioAtual = null;
+let qrCodeInstance = null;
+let config = {periodo:'',horasTrabalhadas:null};
+
+function carregarDados(){
+    try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        ocorrencias = raw ? JSON.parse(raw) : [];
+    }catch(e){
+        ocorrencias = [];
+        console.error('Erro ao carregar dados:', e);
+    }
+    atualizarResumo();
+}
+function salvarDados(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ocorrencias));
+    atualizarResumo();
+    atualizarDashboard();
+    preencherTabela();
+}
+function carregarConfig(){
+    try{
+        const raw = localStorage.getItem(CONFIG_KEY);
+        config = raw ? JSON.parse(raw) : {periodo:'',horasTrabalhadas:null};
+    }catch(e){
+        config = {periodo:'',horasTrabalhadas:null};
+    }
+    const ipPeriodo=document.getElementById('cfg-periodo');
+    const ipHoras=document.getElementById('cfg-horas');
+    if(ipPeriodo) ipPeriodo.value = config.periodo || '';
+    if(ipHoras) ipHoras.value = config.horasTrabalhadas || '';
+}
+function salvarConfig(){
+    const ipPeriodo=document.getElementById('cfg-periodo');
+    const ipHoras=document.getElementById('cfg-horas');
+    if(ipPeriodo && ipHoras){
+        config.periodo = ipPeriodo.value.trim();
+        const h = parseFloat((ipHoras.value || '').replace(',','.'));
+        config.horasTrabalhadas = isNaN(h) ? null : h;
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+        const status=document.getElementById('cfg-status');
+        if(status) status.textContent='Parâmetros salvos. TF/TG atualizados no Dashboard.';
+        atualizarDashboard();
+    }
+}
+
+function gerarId(){
+    return 'OC-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2,8);
+}
+function atualizarResumo(){
+    const span = document.getElementById('resumoRegistros');
+    span.textContent = ocorrencias.length + ' registros salvos localmente';
+}
+
+/* ==========================
+   NAVEGAÇÃO ENTRE SEÇÕES
+   ========================== */
+const navButtons = document.querySelectorAll('.nav-btn');
+const sections = document.querySelectorAll('.section');
+navButtons.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        navButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const id = btn.dataset.section;
+        sections.forEach(sec=>{
+            sec.classList.toggle('active', sec.id === id);
+        });
+    });
+});
+
+/* ==========================
+   AUXILIAR PARA LER FOTOS
+   ========================== */
+function lerImagens(input){
+    return new Promise(resolve=>{
+        const files = input && input.files ? Array.from(input.files) : [];
+        if(!files.length){ resolve([]); return; }
+        const result = [];
+        let loaded = 0;
+        files.forEach(file=>{
+            const reader = new FileReader();
+            reader.onload = e=>{
+                result.push(e.target.result);
+                loaded++;
+                if(loaded === files.length) resolve(result);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+}
+
+/* ==========================
+   FORM – ACIDENTES
+   ========================== */
+document.getElementById('formAcidente').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fotos = await lerImagens(document.getElementById('ac-fotos'));
+    const registro = {
+        id: gerarId(),
+        tipo:'acidente',
+        data:new Date(document.getElementById('ac-data').value).toISOString(),
+        nome:document.getElementById('ac-nome').value.trim(),
+        cpf:document.getElementById('ac-cpf').value.trim(),
+        funcao:document.getElementById('ac-funcao').value.trim(),
+        chefe:document.getElementById('ac-chefe').value.trim(),
+        local:document.getElementById('ac-local').value.trim(),
+        classificacao:document.getElementById('ac-classificacao').value,
+        perda:document.getElementById('ac-perda').value,
+        cat:document.getElementById('ac-cat').value,
+        tipoAcidenteSOC:document.getElementById('ac-tipo-acidente').value,
+        tipoLesao:document.getElementById('ac-tipo-lesao').value.trim(),
+        parteCorpo:document.getElementById('ac-parte-corpo').value.trim(),
+        diasAfast:document.getElementById('ac-dias-afast').value.trim(),
+        cid:document.getElementById('ac-cid').value.trim(),
+        classSOC:document.getElementById('ac-class-soc').value,
+        descricao:document.getElementById('ac-descricao').value.trim(),
+        medidas:document.getElementById('ac-medidas').value.trim(),
+        fotos:fotos
+    };
+    ocorrencias.push(registro);
+    salvarDados();
+    e.target.reset();
+    alert('Acidente registrado com sucesso!');
+});
+
+/* ==========================
+   FORM – NÃO CONFORMIDADES
+   ========================== */
+document.getElementById('formNc').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fotos = await lerImagens(document.getElementById('nc-fotos'));
+    const data = document.getElementById('nc-data').value;
+    const registro = {
+        id:gerarId(),
+        tipo:'nc',
+        data:data ? new Date(data).toISOString() : new Date().toISOString(),
+        ncTipo:document.getElementById('nc-tipo').value,
+        responsavel:document.getElementById('nc-responsavel').value.trim(),
+        identificou:document.getElementById('nc-identificou').value.trim(),
+        local:document.getElementById('nc-local').value.trim(),
+        status:document.getElementById('nc-status').value,
+        classificacao:document.getElementById('nc-classificacao').value,
+        descricao:document.getElementById('nc-descricao').value.trim(),
+        acoes:document.getElementById('nc-acoes').value.trim(),
+        fotos:fotos
+    };
+    ocorrencias.push(registro);
+    salvarDados();
+    e.target.reset();
+    alert('Não conformidade registrada com sucesso!');
+});
+
+/* ==========================
+   FORM – AMBIENTAL
+   ========================== */
+document.getElementById('formAmbiental').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fotos = await lerImagens(document.getElementById('amb-fotos'));
+    const data = document.getElementById('amb-data').value;
+    const registro = {
+        id:gerarId(),
+        tipo:'ambiental',
+        data:data ? new Date(data).toISOString() : new Date().toISOString(),
+        ambTipo:document.getElementById('amb-tipo').value,
+        local:document.getElementById('amb-local').value.trim(),
+        responsavel:document.getElementById('amb-responsavel').value.trim(),
+        volume:document.getElementById('amb-volume').value.trim(),
+        descricao:document.getElementById('amb-descricao').value.trim(),
+        acoes:document.getElementById('amb-acoes').value.trim(),
+        classificacao:null,
+        fotos:fotos
+    };
+    ocorrencias.push(registro);
+    salvarDados();
+    e.target.reset();
+    alert('Registro ambiental salvo com sucesso!');
+});
+
+/* ==========================
+   FORM – EVIDÊNCIAS
+   ========================== */
+document.getElementById('formEvidencia').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fotosAntes = await lerImagens(document.getElementById('ev-fotos-antes'));
+    const fotosDepois = await lerImagens(document.getElementById('ev-fotos-depois'));
+    const data = document.getElementById('ev-data').value;
+    const registro = {
+        id:gerarId(),
+        tipo:'evidencia',
+        data:data ? new Date(data).toISOString() : new Date().toISOString(),
+        titulo:document.getElementById('ev-titulo').value.trim(),
+        area:document.getElementById('ev-area').value.trim(),
+        responsavel:document.getElementById('ev-responsavel').value.trim(),
+        descAntes:document.getElementById('ev-descricaoAntes').value.trim(),
+        descDepois:document.getElementById('ev-descricaoDepois').value.trim(),
+        classificacao:null,
+        fotosAntes:fotosAntes,
+        fotosDepois:fotosDepois
+    };
+    ocorrencias.push(registro);
+    salvarDados();
+    e.target.reset();
+    alert('Evidência salva com sucesso!');
+});
+
+/* ==========================
+   TABELA – BANCO DE DADOS
+   ========================== */
+const filtroTipo = document.getElementById('filtro-tipo');
+const filtroDataInicio = document.getElementById('filtro-data-inicio');
+const filtroDataFim = document.getElementById('filtro-data-fim');
+const filtroTexto = document.getElementById('filtro-texto');
+const filtroClassificacao = document.getElementById('filtro-classificacao');
+document.getElementById('btnAplicarFiltros').addEventListener('click',(e)=>{e.preventDefault();preencherTabela();});
+document.getElementById('btnLimparFiltros').addEventListener('click',(e)=>{
+    e.preventDefault();
+    filtroTipo.value='';
+    filtroDataInicio.value='';
+    filtroDataFim.value='';
+    filtroTexto.value='';
+    filtroClassificacao.value='';
+    preencherTabela();
+});
+
+function filtrarOcorrencias(){
+    return ocorrencias.filter(o=>{
+        if(filtroTipo.value && o.tipo !== filtroTipo.value) return false;
+        if(filtroClassificacao.value && o.classificacao !== filtroClassificacao.value) return false;
+        if(filtroDataInicio.value){
+            const d0 = new Date(filtroDataInicio.value);
+            if(new Date(o.data) < d0) return false;
+        }
+        if(filtroDataFim.value){
+            const d1 = new Date(filtroDataFim.value);
+            d1.setHours(23,59,59,999);
+            if(new Date(o.data) > d1) return false;
+        }
+        if(filtroTexto.value){
+            const t = filtroTexto.value.toLowerCase();
+            const campos = [
+                o.nome,o.local,o.area,o.titulo,o.ambTipo,o.ncTipo,o.descricao,o.descAntes,o.descDepois
+            ].filter(Boolean).join(' ').toLowerCase();
+            if(!campos.includes(t)) return false;
+        }
+        return true;
+    });
+}
+
+function resumoLinha(o){
+    if(o.tipo==='acidente'){
+        return (o.nome || 'Sem nome') + ' – ' + (o.local || '');
+    }else if(o.tipo==='nc'){
+        return (o.ncTipo || 'NC') + ' – ' + (o.local || '');
+    }else if(o.tipo==='ambiental'){
+        return (o.ambTipo || 'Ambiental') + ' – ' + (o.local || '');
+    }else if(o.tipo==='evidencia'){
+        return (o.titulo || 'Evidência') + ' – ' + (o.area || '');
+    }
+    return '';
+}
+
+function badgeTipo(o){
+    if(o.tipo==='acidente') return '<span class="badge badge-acidente">Acidente</span>';
+    if(o.tipo==='nc') return '<span class="badge badge-nc">NC</span>';
+    if(o.tipo==='ambiental') return '<span class="badge badge-ambiental">Ambiental</span>';
+    if(o.tipo==='evidencia') return '<span class="badge badge-evidencia">Evidência</span>';
+    return '';
+}
+
+function preencherTabela(){
+    const corpo = document.getElementById('tabela-registros');
+    corpo.innerHTML = '';
+    const lista = filtrarOcorrencias().sort((a,b)=>new Date(b.data)-new Date(a.data));
+    lista.forEach(o=>{
+        const tr = document.createElement('tr');
+        const data = o.data ? new Date(o.data) : new Date();
+        const dataStr = data.toLocaleDateString('pt-BR');
+        tr.innerHTML = `
+            <td>${badgeTipo(o)}</td>
+            <td>${dataStr}</td>
+            <td>${resumoLinha(o)}</td>
+            <td>${o.classificacao || '-'}</td>
+            <td>
+                <button class="btn btn-outline btn-sm" onclick="abrirDetalhe('${o.id}')">Ver</button>
+                <button class="btn btn-outline btn-sm" onclick="gerarRelatorio('${o.id}')">PDF</button>
+                <button class="btn btn-outline btn-sm" onclick="mostrarQr('${o.id}')">QR</button>
+                <button class="btn btn-danger btn-sm" onclick="excluirRegistro('${o.id}')">Del</button>
+            </td>
+        `;
+        corpo.appendChild(tr);
+    });
+}
+
+/* ==========================
+   DETALHE + QR
+   ========================== */
+function encontrarPorId(id){return ocorrencias.find(o=>o.id===id);}
+
+function abrirModalDetalhe(){
+    document.getElementById('modalDetalhe').style.display='flex';
+}
+function fecharModalDetalhe(){
+    document.getElementById('modalDetalhe').style.display='none';
+}
+function htmlFotos(lista){
+    if(!lista || !lista.length) return '';
+    return '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">' +
+        lista.map(src=>`<img src="${src}" style="max-width:120px;max-height:90px;border-radius:6px;border:1px solid #e5e7eb;">`).join('') +
+        '</div>';
+}
+
+function textoDetalhe(o){
+    const dataStr = o.data ? new Date(o.data).toLocaleString('pt-BR') : '';
+    let html = `<div><strong>ID:</strong> ${o.id}</div>`;
+    html += `<div><strong>Data:</strong> ${dataStr}</div>`;
+    if(o.tipo==='acidente'){
+        html += `<div><strong>Colaborador:</strong> ${o.nome || ''} (${o.funcao || ''})</div>`;
+        html += `<div><strong>Local:</strong> ${o.local || ''}</div>`;
+        html += `<div><strong>Chefe imediato:</strong> ${o.chefe || ''}</div>`;
+        html += `<div><strong>Classificação (matriz):</strong> ${o.classificacao || '-'}</div>`;
+        html += `<div><strong>Com perda / lesão:</strong> ${o.perda || '-'}</div>`;
+        html += `<div><strong>CAT:</strong> ${o.cat || '-'}</div>`;
+        html += `<div><strong>Tipo de acidente (SOC):</strong> ${o.tipoAcidenteSOC || '-'}</div>`;
+        html += `<div><strong>Tipo de lesão:</strong> ${o.tipoLesao || '-'}</div>`;
+        html += `<div><strong>Parte do corpo atingida:</strong> ${o.parteCorpo || '-'}</div>`;
+        html += `<div><strong>Dias de afastamento:</strong> ${o.diasAfast || '0'}</div>`;
+        html += `<div><strong>CID / atestado:</strong> ${o.cid || '-'}</div>`;
+        html += `<div><strong>Classificação SOC / SGI:</strong> ${o.classSOC || '-'}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Descrição:</strong><br>${(o.descricao || '').replace(/\n/g,'<br>')}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Medidas:</strong><br>${(o.medidas || '').replace(/\n/g,'<br>')}</div>`;
+        html += htmlFotos(o.fotos);
+    }else if(o.tipo==='nc'){
+        html += `<div><strong>Tipo de NC:</strong> ${o.ncTipo || ''}</div>`;
+        html += `<div><strong>Área/local:</strong> ${o.local || ''}</div>`;
+        html += `<div><strong>Status:</strong> ${o.status || ''}</div>`;
+        html += `<div><strong>Responsável:</strong> ${o.responsavel || ''}</div>`;
+        html += `<div><strong>Identificou:</strong> ${o.identificou || ''}</div>`;
+        html += `<div><strong>Classificação:</strong> ${o.classificacao || '-'}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Descrição:</strong><br>${(o.descricao || '').replace(/\n/g,'<br>')}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Ações:</strong><br>${(o.acoes || '').replace(/\n/g,'<br>')}</div>`;
+        html += htmlFotos(o.fotos);
+    }else if(o.tipo==='ambiental'){
+        html += `<div><strong>Tipo:</strong> ${o.ambTipo || ''}</div>`;
+        html += `<div><strong>Local:</strong> ${o.local || ''}</div>`;
+        html += `<div><strong>Responsável:</strong> ${o.responsavel || ''}</div>`;
+        html += `<div><strong>Volume/Extensão:</strong> ${o.volume || ''}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Descrição:</strong><br>${(o.descricao || '').replace(/\n/g,'<br>')}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Ações:</strong><br>${(o.acoes || '').replace(/\n/g,'<br>')}</div>`;
+        html += htmlFotos(o.fotos);
+    }else if(o.tipo==='evidencia'){
+        html += `<div><strong>Título:</strong> ${o.titulo || ''}</div>`;
+        html += `<div><strong>Área:</strong> ${o.area || ''}</div>`;
+        html += `<div><strong>Responsável:</strong> ${o.responsavel || ''}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Antes:</strong><br>${(o.descAntes || '').replace(/\n/g,'<br>')}</div>`;
+        html += `<div style="margin-top:4px;"><strong>Depois:</strong><br>${(o.descDepois || '').replace(/\n/g,'<br>')}</div>`;
+        html += '<div style="margin-top:4px;"><strong>Fotos antes:</strong></div>'+htmlFotos(o.fotosAntes);
+        html += '<div style="margin-top:4px;"><strong>Fotos depois:</strong></div>'+htmlFotos(o.fotosDepois);
+    }
+    return html;
+}
+
+function abrirDetalhe(id){
+    const o = encontrarPorId(id);
+    if(!o) return;
+    document.getElementById('modalTitulo').textContent = 'Detalhes – ' + (o.tipo.toUpperCase());
+    document.getElementById('modalConteudo').innerHTML = textoDetalhe(o);
+    mostrarQrInterno(o);
+    abrirModalDetalhe();
+}
+
+function mostrarQr(id){
+    const o = encontrarPorId(id);
+    if(!o) return;
+    document.getElementById('modalTitulo').textContent = 'QR Code – ' + id;
+    document.getElementById('modalConteudo').innerHTML = textoDetalhe(o);
+    mostrarQrInterno(o);
+    abrirModalDetalhe();
+}
+function mostrarQrInterno(o){
+    const container = document.getElementById('qrContainer');
+    container.innerHTML = '';
+    qrCodeInstance = new QRCode(container,{
+        text: JSON.stringify({id:o.id,tipo:o.tipo,data:o.data}),
+        width:160,
+        height:160
+    });
+}
+function baixarQr(){
+    if(!qrCodeInstance) return;
+    const img = document.querySelector('#qrContainer img') || document.querySelector('#qrContainer canvas');
+    if(!img) return;
+    let dataUrl;
+    if(img.tagName.toLowerCase()==='img'){
+        dataUrl = img.src;
+    }else{
+        dataUrl = img.toDataURL('image/png');
+    }
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'qr_sgi_conterplan.png';
+    a.click();
+}
+
+/* ==========================
+   EXCLUIR
+   ========================== */
+function excluirRegistro(id){
+    if(!confirm('Excluir este registro?')) return;
+    ocorrencias = ocorrencias.filter(o=>o.id!==id);
+    salvarDados();
+}
+
+/* ==========================
+   DASHBOARD (CHART.JS)
+   ========================== */
+let chartTipos=null, chartMeses=null, chartPerda=null, chartSetores=null;
+
+function atualizarDashboard(){
+    const total = ocorrencias.length;
+    document.getElementById('kpiTotal').textContent = total;
+    document.getElementById('kpiTotalDetalhe').textContent = total? 'Registros consolidados no sistema' : 'Nenhum registro ainda';
+
+    const agora = new Date();
+    const mesAtual = agora.getMonth();
+    const anoAtual = agora.getFullYear();
+    const acidentesMes = ocorrencias.filter(o=>{
+        if(o.tipo!=='acidente') return false;
+        const d = new Date(o.data);
+        return d.getMonth()===mesAtual && d.getFullYear()===anoAtual;
+    }).length;
+    document.getElementById('kpiAcidentesMes').textContent = acidentesMes;
+    document.getElementById('kpiAcidentesMesDetalhe').textContent = 'Mês ' + (mesAtual+1) + '/' + anoAtual;
+
+    const ncTotal = ocorrencias.filter(o=>o.tipo==='nc').length;
+    const ncResolvidas = ocorrencias.filter(o=>o.tipo==='nc' && o.status==='Concluído').length;
+    const perc = ncTotal? Math.round((ncResolvidas/ncTotal)*100) : 0;
+    document.getElementById('kpiNcResolvidas').textContent = perc+'%';
+    document.getElementById('kpiNcResolvidasDetalhe').textContent = ncTotal? (ncResolvidas+' de '+ncTotal+' concluídas') : 'Nenhuma NC registrada';
+
+    // TF / TG
+    const horas = config.horasTrabalhadas;
+    const acidentesComAfast = ocorrencias.filter(o=>o.tipo==='acidente' && (o.classSOC==='Com afastamento' || o.perda==='com_perda')).length;
+    const diasPerdidos = ocorrencias.filter(o=>o.tipo==='acidente' && (o.classSOC==='Com afastamento' || o.perda==='com_perda'))
+        .reduce((s,o)=> s + (parseFloat(o.diasAfast || '0') || 0),0);
+    if(horas && horas>0){
+        const tf = acidentesComAfast ? (acidentesComAfast*1e6/horas) : 0;
+        const tg = diasPerdidos ? (diasPerdidos*1e6/horas) : 0;
+        const fmt = v => v.toFixed(2).replace('.',',');
+        document.getElementById('kpiTf').textContent = fmt(tf);
+        document.getElementById('kpiTg').textContent = fmt(tg);
+        document.getElementById('kpiTfDetalhe').textContent = (config.periodo || 'Período não definido') + ' – acidentes com lesão: ' + acidentesComAfast;
+        document.getElementById('kpiTgDetalhe').textContent = 'Dias de afastamento: ' + diasPerdidos;
+    }else{
+        document.getElementById('kpiTf').textContent = '--';
+        document.getElementById('kpiTg').textContent = '--';
+        document.getElementById('kpiTfDetalhe').textContent = 'Informe horas trabalhadas em Configurações.';
+        document.getElementById('kpiTgDetalhe').textContent = 'Dias de afastamento somados dos acidentes.';
+    }
+
+    // gráfico tipos
+    const contTipos = {acidente:0,nc:0,ambiental:0,evidencia:0};
+    ocorrencias.forEach(o=>{ if(contTipos[o.tipo]!=null) contTipos[o.tipo]++; });
+    const ctx1 = document.getElementById('chartTipos').getContext('2d');
+    const dataTipos = {
+        labels:['Acidentes','Não Conformidades','Ambiental','Evidências'],
+        datasets:[{
+            data:[
+                contTipos.acidente,
+                contTipos.nc,
+                contTipos.ambiental,
+                contTipos.evidencia
+            ]
+        }]
+    };
+    if(chartTipos) chartTipos.destroy();
+    chartTipos = new Chart(ctx1,{
+        type:'doughnut',
+        data:dataTipos,
+        options:{
+            animation:false,
+            plugins:{legend:{position:'bottom'}},
+            responsive:true,
+            maintainAspectRatio:false
+        }
+    });
+
+    // gráfico meses últimos 12
+    const meses = [];
+    const valores = [];
+    for(let i=11;i>=0;i--){
+        const d = new Date();
+        d.setMonth(d.getMonth()-i);
+        const m = d.getMonth();
+        const a = d.getFullYear();
+        const label = ('0'+(m+1)).slice(-2)+'/'+a.toString().slice(-2);
+        meses.push(label);
+        const count = ocorrencias.filter(o=>{
+            const dt = new Date(o.data);
+            return dt.getMonth()===m && dt.getFullYear()===a;
+        }).length;
+        valores.push(count);
+    }
+    const ctx2 = document.getElementById('chartMeses').getContext('2d');
+    if(chartMeses) chartMeses.destroy();
+    chartMeses = new Chart(ctx2,{
+        type:'bar',
+        data:{
+            labels:meses,
+            datasets:[{data:valores}]
+        },
+        options:{
+            animation:false,
+            plugins:{legend:{display:false}},
+            responsive:true,
+            maintainAspectRatio:false
+        }
+    });
+
+    // gráfico acidentes com perda x sem perda
+    const acidentes = ocorrencias.filter(o=>o.tipo==='acidente');
+    let comPerda=0, semPerda=0;
+    acidentes.forEach(a=>{
+        if(a.perda==='com_perda') comPerda++;
+        else semPerda++;
+    });
+    const ctx3 = document.getElementById('chartPerda').getContext('2d');
+    if(chartPerda) chartPerda.destroy();
+    chartPerda = new Chart(ctx3,{
+        type:'pie',
+        data:{
+            labels:['Com perda / lesão','Sem perda'],
+            datasets:[{data:[comPerda,semPerda]}]
+        },
+        options:{
+            animation:false,
+            plugins:{legend:{position:'bottom'}},
+            responsive:true,
+            maintainAspectRatio:false
+        }
+    });
+
+    // ranking de setores
+    const setoresCount = {};
+    acidentes.forEach(a=>{
+        const key = (a.local || 'Não informado').trim() || 'Não informado';
+        setoresCount[key] = (setoresCount[key] || 0) + 1;
+    });
+    const entries = Object.entries(setoresCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const labelsSet = entries.map(e=>e[0]);
+    const valoresSet = entries.map(e=>e[1]);
+    const ctx4 = document.getElementById('chartSetores').getContext('2d');
+    if(chartSetores) chartSetores.destroy();
+    chartSetores = new Chart(ctx4,{
+        type:'bar',
+        data:{
+            labels:labelsSet,
+            datasets:[{data:valoresSet}]
+        },
+        options:{
+            indexAxis:'y',
+            animation:false,
+            plugins:{legend:{display:false}},
+            responsive:true,
+            maintainAspectRatio:false
+        }
+    });
+}
+
+/* ==========================
+   RELATÓRIO / PDF / COPIAR
+   ========================== */
+function gerarRelatorio(id){
+    const o = encontrarPorId(id);
+    if(!o) return;
+    relatorioAtual = o;
+    const container = document.getElementById('previewRelatorio');
+    const dataStr = o.data ? new Date(o.data).toLocaleString('pt-BR') : '';
+    let html = `<h3 style="margin:0 0 6px 0;">Relatório – ${o.tipo.toUpperCase()}</h3>`;
+    html += `<p style="margin:0 0 4px 0;font-size:11px;color:#4b5563;">ID: ${o.id} | Data: ${dataStr}</p>`;
+    html += textoDetalhe(o);
+    container.innerHTML = html;
+    alert('Relatório carregado. Agora você pode gerar o PDF ou copiar o texto.');
+}
+
+async function gerarPdfDoRelatorio(){
+    if(!relatorioAtual){
+        alert('Selecione um registro na aba Banco de Dados (botão PDF).');
+        return;
+    }
+    const area = document.getElementById('areaPdf');
+    const o = relatorioAtual;
+    const dataStr = o.data ? new Date(o.data).toLocaleString('pt-BR') : '';
+
+    // PDF ESPECIAL PARA ACIDENTE COM LESÃO
+    const isAcidente = o.tipo==='acidente';
+    const isLesao = isAcidente && (o.perda==='com_perda' || o.classSOC==='Com afastamento');
+
+    if(isAcidente){
+        // Cabeçalho diferente
+        area.innerHTML = `
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                <div style="width:70px;height:70px;border-radius:12px;border:2px solid #b91c1c;display:flex;align-items:center;justify-content:center;background:#fee2e2;">
+                    <span style="font-size:34px;">🦺</span>
+                </div>
+                <div>
+                    <div style="font-size:16px;font-weight:700;">Conterplan – SGI Segurança & Meio Ambiente</div>
+                    <div style="font-size:12px;font-weight:600;color:#b91c1c;">
+                        ${isLesao ? 'RELATÓRIO DE ACIDENTE COM LESÃO / COM AFASTAMENTO' : 'RELATÓRIO DE ACIDENTE / INCIDENTE'}
+                    </div>
+                    <div style="font-size:11px;">Atendimento às exigências do SOC / CAT / SGI interno</div>
+                </div>
+            </div>
+            <hr>
+            <div style="font-size:11px;margin-top:4px;">
+                <strong>ID local:</strong> ${o.id}<br>
+                <strong>Data e horário:</strong> ${dataStr}<br>
+                <strong>Classificação de risco (matriz):</strong> ${o.classificacao || '-'}<br>
+                <strong>Tipo de acidente (SOC):</strong> ${o.tipoAcidenteSOC || '-'}<br>
+            </div>
+
+            <h4 style="margin-top:8px;font-size:12px;">1. Dados do colaborador</h4>
+            <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:2px;">
+                <tr>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Nome:</strong> ${o.nome || ''}</td>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Função:</strong> ${o.funcao || ''}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>CPF:</strong> ${o.cpf || ''}</td>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Chefe imediato:</strong> ${o.chefe || ''}</td>
+                </tr>
+            </table>
+
+            <h4 style="margin-top:8px;font-size:12px;">2. Caracterização do acidente</h4>
+            <table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:2px;">
+                <tr>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Local / Setor:</strong> ${o.local || ''}</td>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Com perda / lesão:</strong> ${o.perda || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Abertura de CAT:</strong> ${o.cat || '-'}</td>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Classificação SOC / SGI:</strong> ${o.classSOC || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Tipo de lesão:</strong> ${o.tipoLesao || '-'}</td>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Parte do corpo:</strong> ${o.parteCorpo || '-'}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>Dias de afastamento:</strong> ${o.diasAfast || '0'}</td>
+                    <td style="border:1px solid #d1d5db;padding:4px;"><strong>CID / Atestado:</strong> ${o.cid || '-'}</td>
+                </tr>
+            </table>
+
+            <h4 style="margin-top:8px;font-size:12px;">3. Descrição do ocorrido</h4>
+            <div style="font-size:11px;margin-top:2px;">
+                ${(o.descricao || '').replace(/\n/g,'<br>')}
+            </div>
+
+            <h4 style="margin-top:8px;font-size:12px;">4. Medidas adotadas / Ações corretivas e preventivas</h4>
+            <div style="font-size:11px;margin-top:2px;">
+                ${(o.medidas || '').replace(/\n/g,'<br>')}
+            </div>
+
+            <h4 style="margin-top:8px;font-size:12px;">5. Evidências fotográficas</h4>
+            <div style="font-size:11px;margin-top:2px;">
+                (As fotos são incorporadas como anexo visual deste relatório.)
+            </div>
+        `;
+    }else{
+        // modelo genérico (mesmo do anterior)
+        area.innerHTML = `
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                <div style="width:64px;height:64px;border-radius:999px;border:2px solid #0f172a;display:flex;align-items:center;justify-content:center;">
+                    <span style="font-size:28px;">🦺</span>
+                </div>
+                <div>
+                    <div style="font-size:16px;font-weight:700;">Conterplan – SGI Segurança & Meio Ambiente</div>
+                    <div style="font-size:11px;">Relatório detalhado de ocorrência | ${o.tipo.toUpperCase()}</div>
+                </div>
+            </div>
+            <hr>
+            <div style="font-size:11px;margin-top:4px;">
+                <strong>ID:</strong> ${o.id}<br>
+                <strong>Data:</strong> ${dataStr}<br>
+                <strong>Classificação de risco:</strong> ${o.classificacao || '-'}<br>
+            </div>
+            <div style="margin-top:6px;font-size:11px;">
+                ${textoDetalhe(o)}
+            </div>
+        `;
+    }
+
+    const canvas = await html2canvas(area,{scale:2});
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p','pt','a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const imgWidth = pageWidth-40;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+    pdf.addImage(imgData,'PNG',20,20,imgWidth,imgHeight);
+    pdf.save(isLesao ? 'Relatorio_Acidente_Com_Lesao_Conterplan.pdf' : 'Relatorio_SGI_Conterplan.pdf');
+}
+
+document.getElementById('btnGerarPdfDireto').addEventListener('click',()=>{gerarPdfDoRelatorio();});
+
+document.getElementById('btnCopiarTexto').addEventListener('click',()=>{
+    if(!relatorioAtual){
+        alert('Selecione um registro na aba Banco de Dados (botão PDF).');
+        return;
+    }
+    const tmp = document.createElement('textarea');
+    tmp.value = document.getElementById('previewRelatorio').innerText;
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+    alert('Texto copiado. Cole no WhatsApp ou e-mail.');
+});
+
+/* ==========================
+   EXPORT / IMPORT JSON
+   ========================== */
+document.getElementById('btnExportarJson').addEventListener('click',()=>{
+    const blob = new Blob([JSON.stringify(ocorrencias,null,2)],{type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sgi_conterplan_backup.json';
+    a.click();
+});
+
+document.getElementById('inputImportarJson').addEventListener('change',e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+        try{
+            const dados = JSON.parse(ev.target.result);
+            if(Array.isArray(dados)){
+                ocorrencias = dados;
+                salvarDados();
+                alert('Backup importado com sucesso.');
+            }else{
+                alert('Arquivo inválido.');
+            }
+        }catch(err){
+            alert('Erro ao ler arquivo.');
+        }
+    };
+    reader.readAsText(file);
+});
+
+/* ==========================
+   SUPABASE – OPCIONAL
+   ========================== */
+function criarClienteSupabase(){
+    const url = document.getElementById('sp-url').value.trim();
+    const key = document.getElementById('sp-key').value.trim();
+    if(!url || !key) return null;
+    return supabase.createClient(url,key);
+}
+async function testarSupabase(){
+    const status = document.getElementById('statusSupabase');
+    const client = criarClienteSupabase();
+    if(!client){
+        status.textContent = 'Preencha URL e Anon Key.';
+        return;
+    }
+    status.textContent = 'Testando conexão...';
+    try{
+        const { error } = await client.from(document.getElementById('sp-tabela').value).select('*').limit(1);
+        if(error) throw error;
+        status.textContent = 'Conexão OK. Tabela acessível.';
+    }catch(e){
+        status.textContent = 'Erro ao acessar tabela: ' + e.message;
+    }
+}
+async function sincronizarSupabase(){
+    const status = document.getElementById('statusSupabase');
+    const client = criarClienteSupabase();
+    if(!client){
+        status.textContent = 'Preencha URL e Anon Key.';
+        return;
+    }
+    status.textContent = 'Sincronizando registros...';
+    try{
+        const tabela = document.getElementById('sp-tabela').value;
+        const payload = ocorrencias.map(o=>({
+            id_local:o.id,
+            tipo:o.tipo,
+            data:o.data,
+            classificacao:o.classificacao || null,
+            corpo:JSON.stringify(o)
+        }));
+        const { error } = await client.from(tabela).upsert(payload,{onConflict:'id_local'});
+        if(error) throw error;
+        status.textContent = 'Sincronização concluída.';
+    }catch(e){
+        status.textContent = 'Erro na sincronização: ' + e.message;
+    }
+}
+document.getElementById('btnTestarSupabase').addEventListener('click',(e)=>{e.preventDefault();testarSupabase();});
+document.getElementById('btnSincronizarAgora').addEventListener('click',(e)=>{e.preventDefault();sincronizarSupabase();});
+
+/* ==========================
+   CONFIG – TF/TG
+   ========================== */
+document.getElementById('btnSalvarCfgTfTg').addEventListener('click',(e)=>{e.preventDefault();salvarConfig();});
+
+/* ==========================
+   INICIALIZAÇÃO
+   ========================== */
+carregarDados();
+carregarConfig();
+atualizarDashboard();
+preencherTabela();
+</script>
+</body>
+</html>
+
