@@ -2623,11 +2623,11 @@ Pedro Oliveira;45678912300;Eletricista" required="" rows="4"></textarea>
 <div class="form-grid">
 <div>
 <label>Supabase URL</label>
-<input class="input" id="cfgSupURL" placeholder="https://svjysfphfonvsqcqhphc.supabase.co"/>
+<input class="input" id="cfgSupURL" placeholder="https://xxxxx.supabase.co"/>
 </div>
 <div>
 <label>Supabase Anon Key</label>
-<input class="input" id="cfgSupKey" placeholder="ceyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2anlzZnBoZm9udnNxY3FocGhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0NjMyNDgsImV4cCI6MjA4MTAzOTI0OH0.ZCa2mWvCs5PEofwV2A-JJFYws3kzBe7Fso7Ss3kBVK4"/>
+<input class="input" id="cfgSupKey" placeholder="Cole aqui a API Anon"/>
 </div>
 <div>
 <label>Nome da tabela</label>
@@ -7593,7 +7593,7 @@ let faceDetector = null;
 let videoStream = null;
 let currentFaceDescriptor = null;
 let currentFaceMatch = null;
-let charts = {};
+charts = {};
 
 // =========================
 // FUNÇÕES UTILITÁRIAS
@@ -7638,12 +7638,44 @@ function loadFromStorage(key, defaultValue = []) {
 // =========================
 // INICIALIZAÇÃO
 // =========================
-function initApp() {
+// function initApp() {
   // Carregar dados
+  // estoqueDB = loadFromStorage(LS_ESTOQUE, []);
+  // catalogoEPI = loadFromStorage(LS_CATALOGO, EPI_CATALOGO_BASE);
+  // solicitacoesDB = loadFromStorage(LS_SOLICITACOES, []);
+  // rostosDB = loadFromStorage(LS_ROSTOS, []);
+  
+  // Configurar data atual
+  // const today = formatDate();
+  // $('estoqueData').value = today;
+  // $('dataSolicitacao').value = today;
+  // $('hoje').textContent = formatDateTime();
+  
+  // Inicializar componentes
+  // initCatalogoEPI();
+  // initAssinatura();
+  // initNavigation();
+  // initEventListeners();
+  // initFaceAPI();
+  
+  // Renderizar dados
+  // renderEstoque();
+  // renderCatalogo();
+  // renderSolicitacoes();
+  // renderRostos();
+  // updateCharts();
+  
+  // console.log('Sistema de Estoque inicializado com sucesso!');
+// }
+async function initApp() { // Adicionado async
+  // Carregar dados locais primeiro (para velocidade inicial)
   estoqueDB = loadFromStorage(LS_ESTOQUE, []);
   catalogoEPI = loadFromStorage(LS_CATALOGO, EPI_CATALOGO_BASE);
   solicitacoesDB = loadFromStorage(LS_SOLICITACOES, []);
   rostosDB = loadFromStorage(LS_ROSTOS, []);
+  
+  // --- NOVO: Tentar carregar dados do Supabase para atualizar o local ---
+  await sincronizarDadosDoSupabase(); 
   
   // Configurar data atual
   const today = formatDate();
@@ -7658,16 +7690,49 @@ function initApp() {
   initEventListeners();
   initFaceAPI();
   
-  // Renderizar dados
+  // Renderizar dados (agora com os dados atualizados do banco)
   renderEstoque();
   renderCatalogo();
   renderSolicitacoes();
   renderRostos();
   updateCharts();
   
-  console.log('Sistema de Estoque inicializado com sucesso!');
+  console.log('Sistema de Estoque inicializado com sucesso e sincronizado!');
 }
+async function sincronizarDadosDoSupabase() {
+  // Verifica se o cliente Supabase e a tabela estão configurados
+  const table = $('cfgSupTable')?.value || 'sgiCONTERPLAN_registros';
+  
+  if (typeof _supabase !== 'undefined') {
+    try {
+      const { data, error } = await _supabase
+        .from(table)
+        .select('*');
 
+      if (error) {
+        console.warn('Erro ao buscar dados do Supabase (Verifique o RLS):', error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Mapeia os dados do banco de volta para o formato que seu sistema entende
+        // Assumindo que o conteúdo principal está dentro da coluna 'payload'
+        const dadosDoBanco = data.map(item => ({
+          ...item.payload,
+          id: item.id,
+          sincronizado: true
+        }));
+
+        // Atualiza a variável global e o localStorage
+        solicitacoesDB = dadosDoBanco; 
+        saveToStorage(LS_SOLICITACOES, solicitacoesDB);
+        console.log('Dados baixados do Supabase com sucesso!');
+      }
+    } catch (err) {
+      console.error('Falha na conexão com Supabase:', err);
+    }
+  }
+}
 // =========================
 // NAVEGAÇÃO
 // =========================
